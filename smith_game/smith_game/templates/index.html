@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>대장간 게임</title>
+    <div id="gameTitle">대장장이 미니게임</div>
+
+    <style>
+        #gameTitle {
+            position: absolute;
+            top: 20px; /* 화면 상단에서 20px 아래 */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 128pt;
+            font-weight: bold;
+            color: white;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.6); /* 글씨 가독성을 위해 그림자 */
+            z-index: 100;
+            pointer-events: none; /* 클릭 방해 안함 */
+        }
+        
+        body {
+            background-image: url("{{ url_for('static', filename='images/place.png') }}");
+            background-size: cover;
+            background-position: center;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #anvil {
+            width: 600px;
+            height: 400px;
+            position: relative;
+            top: 150px;
+            z-index: 1;
+        }
+
+        #stone {
+            width: 240px;
+            height: 150px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(calc(-50% + 50px), calc(-50% - 20px));
+            z-index: 2;
+            cursor: pointer;
+        }
+
+        /* 미니게임 모달 */
+        .modal {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            position: relative;
+            width: 800px;
+            max-width: 90%;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        .close-button {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            font-size: 26px;
+            cursor: pointer;
+            color: #777;
+        }
+        .modal-images {
+            position: relative;
+            height: 350px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+        .modal-anvil {
+            width: 400px;
+            height: 250px;
+            position: absolute;
+            bottom: 0;
+        }
+        .modal-stone {
+            width: 200px;
+            height: 150px;
+            position: absolute;
+            bottom: 200px;
+            left: 55%;
+            top: 30pt;
+            transform: translateX(-50%);
+            z-index: 2;
+        }
+
+        #pickaxe {
+            position: absolute;
+            bottom: 220px;
+            left: calc(50% + 80px);
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            transform-origin: top left;
+            transition: transform 0.2s;
+        }
+        #pickaxe.swing {
+            transform: rotate(-45deg) translateX(-20px);
+        }
+
+        /* 돌 흔들림 애니메이션 추가 */
+        @keyframes stone-shake {
+            0% { transform: translateX(-50%) translateY(0); }
+            25% { transform: translateX(calc(-50% - 10px)) translateY(0); }
+            50% { transform: translateX(calc(-50% + 10px)) translateY(0); }
+            75% { transform: translateX(calc(-50% - 10px)) translateY(0); }
+            100% { transform: translateX(-50%) translateY(0); }
+        }
+        .modal-stone.shake {
+            animation: stone-shake 0.3s ease-in-out;
+        }
+
+        /* 게이지 바 */
+        .gauge-bar-area {
+            width: 1000px;
+            max-width: 100%;
+            height: 50px;
+            background: red;
+            margin: 30px auto;
+            position: relative;
+            overflow: hidden;
+        }
+        .yellow-zone {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 50px;
+            background: yellow;
+            opacity: 0.8;
+        }
+        #yellowZone1 { left: 20%; }
+        #yellowZone2 { left: 50%; }
+        #yellowZone3 { left: 80%; }
+
+        #cursor {
+            position: absolute;
+            top: -10px;
+            width: 10px;
+            height: 70px;
+            background: #fff;
+            border-radius: 3px;
+            animation: moveCursor 1.5s linear infinite alternate;
+        }
+        #cursor.paused {
+            animation-play-state: paused;
+        }
+        @keyframes moveCursor {
+            0% { left: 0; }
+            100% { left: calc(100% - 10px); }
+        }
+
+        #gameStatus {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        /* 내부 모달 */
+        .inner-modal {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            align-items: flex-start; /* 중앙 대신 위쪽 정렬 */
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 20;
+        }
+
+        .inner-modal .inner-content {
+            width: 420px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+            text-align: center;
+            margin-top: 250pt;
+        }
+
+        .inner-close-button {
+            margin-top: 16px;
+            padding: 8px 18px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            background: gold;
+            font-weight: 600;
+        }
+
+        /* 난이도 선택 UI */
+        #difficulty-selector {
+            position: absolute;
+            bottom: -350px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            z-index: 1;
+            text-shadow: 2px 2px 4px #000;
+        }
+        #difficulty-selector span {
+            font-size: 64pt;
+            cursor: pointer;
+            padding: 0 20px;
+            user-select: none;
+        }
+        #difficulty-text {
+            font-size: 32pt;
+            font-weight: bold;
+            min-width: 180px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img id="stone" src="{{ url_for('static', filename='images/stone.png') }}" alt="광석" />
+        <img id="anvil" src="{{ url_for('static', filename='images/anvil.png') }}" alt="모루" />
+        
+        <div id="difficulty-selector">
+            <span id="left-arrow">&lt;</span>
+            <span id="difficulty-text">초보</span>
+            <span id="right-arrow">&gt;</span>
+        </div>
+    </div>
+
+    <div id="gameModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="gameClose">&times;</span>
+            <h2>대장간 미니게임</h2>
+
+            <div class="modal-images">
+                <img class="modal-stone" id="modalStone" src="{{ url_for('static', filename='images/stone.png') }}" alt="광석" />
+                <img class="modal-anvil" src="{{ url_for('static', filename='images/anvil.png') }}" alt="모루" />
+                <img id="pickaxe" src="{{ url_for('static', filename='images/pickaxe.png') }}" alt="곡괭이" />
+            </div>
+
+            <div class="gauge-bar-area" id="gaugeBar">
+                <div class="yellow-zone" id="yellowZone1"></div>
+                <div class="yellow-zone" id="yellowZone2"></div>
+                <div class="yellow-zone" id="yellowZone3"></div>
+                <div id="cursor"></div>
+            </div>
+
+            <p id="gameStatus">성공 횟수: <span id="successCount">0</span>회 | 실패 횟수: <span id="failCount">0</span>회</p>
+            <p>스페이스 바를 눌러 곡괭이를 멈추세요!</p>
+
+            <div class="inner-modal" id="innerModal">
+                <div class="inner-content">
+                    <h3 id="rewardTitle">🎉 광석을 캤습니다! 🎉</h3>
+                    <p id="rewardText">축하합니다. 광석을 획득했습니다.</p>
+                    <button class="inner-close-button" id="innerClose">확인</button>
+                </div>
+            </div>
+
+            <div class="inner-modal" id="failModal">
+                <div class="inner-content">
+                    <h3>💥 실패했습니다! 💥</h3>
+                    <img id="failImage" src="{{ url_for('static', filename='images/broken_stone.png') }}" alt="부서진 광석" style="width: 120px; margin: 10px 0;" />
+                    <p>다시 도전하세요.</p>
+                    <button class="inner-close-button" id="failClose">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const IMG_BASE = "{{ url_for('static', filename='images/') }}";
+        const stone = document.getElementById('stone');
+        const gameModal = document.getElementById('gameModal');
+        const gameClose = document.getElementById('gameClose');
+        const modalStone = document.getElementById('modalStone');
+        const gaugeBar = document.getElementById('gaugeBar');
+        const cursor = document.getElementById('cursor');
+        const pickaxe = document.getElementById('pickaxe');
+        const successCountSpan = document.getElementById('successCount');
+        const failCountSpan = document.getElementById('failCount');
+        const innerModal = document.getElementById('innerModal');
+        const innerClose = document.getElementById('innerClose');
+        const failModal = document.getElementById('failModal');
+        const failClose = document.getElementById('failClose');
+        const rewardTitle = document.getElementById('rewardTitle');
+        const rewardText = document.getElementById('rewardText');
+        const difficultyText = document.getElementById('difficulty-text');
+        const leftArrow = document.getElementById('left-arrow');
+        const rightArrow = document.getElementById('right-arrow');
+        const yellowZones = [
+            document.getElementById('yellowZone1'),
+            document.getElementById('yellowZone2'),
+            document.getElementById('yellowZone3')
+        ];
+
+        const difficulties = [
+            { 
+                name: '초보', 
+                speed: 2, 
+                zoneWidth: 50, 
+                rewards: [
+                    { file: 'stone.png', prob: 0.8 },
+                    { file: 'silver.png', prob: 0.15 },
+                    { file: 'gold.png', prob: 0.05 }
+                ]
+            },
+            { 
+                name: '중수', 
+                speed: 1, 
+                zoneWidth: 30, 
+                rewards: [
+                    { file: 'stone.png', prob: 0.25 },
+                    { file: 'silver.png', prob: 0.4 },
+                    { file: 'gold.png', prob: 0.3 },
+                    { file: 'diamond.png', prob: 0.05 }
+                ]
+            },
+            { 
+                name: '고수', 
+                speed: 0.75, 
+                zoneWidth: 20, 
+                rewards: [
+                    { file: 'silver.png', prob: 0.25 },
+                    { file: 'gold.png', prob: 0.55 },
+                    { file: 'diamond.png', prob: 0.2 }
+                ]
+            }
+        ];
+
+        let currentDifficultyIndex = 0;
+        let successCount = 0;
+        let failCount = 0;
+        let gameActive = false;
+        let animationPaused = false;
+        let finalReward = '';
+
+        function setModalStone(name) { modalStone.src = IMG_BASE + name; }
+
+        function changeDifficulty(direction) {
+            currentDifficultyIndex += direction;
+            if (currentDifficultyIndex < 0) currentDifficultyIndex = difficulties.length - 1;
+            else if (currentDifficultyIndex >= difficulties.length) currentDifficultyIndex = 0;
+            difficultyText.textContent = difficulties[currentDifficultyIndex].name;
+            applyDifficulty();
+        }
+        leftArrow.addEventListener('click', () => changeDifficulty(-1));
+        rightArrow.addEventListener('click', () => changeDifficulty(1));
+
+        function applyDifficulty() {
+            const diff = difficulties[currentDifficultyIndex];
+            cursor.style.animationDuration = diff.speed + 's';
+            yellowZones.forEach((zone, i) => {
+                zone.style.width = diff.zoneWidth + 'px';
+                if(i===0) zone.style.left = '20%';
+                else if(i===1) zone.style.left = '50%';
+                else if(i===2) zone.style.left = '80%';
+            });
+        }
+
+        stone.addEventListener('click', () => {
+            gameModal.style.display = 'flex';
+            startGame();
+        });
+
+        gameClose.addEventListener('click', closeGameModal);
+        window.addEventListener('click', (e) => { if(e.target===gameModal) closeGameModal(); });
+
+        function closeGameModal() {
+            innerModal.style.display = 'none';
+            failModal.style.display = 'none';
+            gameModal.style.display = 'none';
+            resetGame();
+        }
+
+        function startGame() {
+            successCount = 0;
+            failCount = 0;
+            animationPaused = false;
+            gameActive = true;
+            updateStatus();
+            applyDifficulty();
+            cursor.classList.remove('paused');
+            cursor.style.animationPlayState = 'running';
+        }
+
+        function resetGame() {
+            gameActive = false;
+            successCount = 0;
+            failCount = 0;
+            cursor.classList.add('paused');
+            cursor.style.left = '0px';
+            setModalStone('stone.png');
+            updateStatus();
+        }
+
+        function updateStatus() {
+            successCountSpan.textContent = successCount;
+            failCountSpan.textContent = failCount;
+
+            if (successCount === 1) setModalStone('stone1.png');
+            else if (successCount === 2) setModalStone('stone2.png');
+            else if (successCount >= 3) setModalStone('stone2.png');
+
+            if (successCount >= 3 && !finalReward) {
+                const rewards = difficulties[currentDifficultyIndex].rewards;
+                finalReward = getRewardForDifficulty(rewards);
+                setTimeout(() => {
+                    setModalStone(finalReward);
+                    rewardTitle.textContent = `🎉 ${getRewardName(finalReward)}을(를) 캤습니다! 🎉`;
+                    rewardText.textContent = `축하합니다. ${getRewardName(finalReward)}을(를) 획득했습니다.`;
+                    innerModal.style.display = 'flex';
+                    cursor.classList.add('paused');
+                    gameActive = false;
+                }, 250);
+            }
+
+            if (failCount >= 3) {
+                failModal.style.display = 'flex';
+                cursor.classList.add('paused');
+                gameActive = false;
+            }
+        }
+
+        function getRewardForDifficulty(rewards) {
+            const rand = Math.random();
+            let cumulative = 0;
+            for(const r of rewards){
+                cumulative += r.prob;
+                if(rand <= cumulative) return r.file;
+            }
+            return rewards[rewards.length - 1].file;
+        }
+
+        function getRewardName(file) {
+            switch(file) {
+                case 'stone.png': return '돌';
+                case 'stone1.png': return '돌';
+                case 'stone2.png': return '돌';
+                case 'silver.png': return '은';
+                case 'gold.png': return '금';
+                case 'diamond.png': return '다이아몬드';
+                default: return '광석';
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && gameActive && !animationPaused) {
+                e.preventDefault();
+                checkHit();
+            }
+        });
+
+        function checkHit() {
+            animationPaused = true;
+            cursor.classList.add('paused');
+            cursor.style.animationPlayState = 'paused';
+
+            const cRect = cursor.getBoundingClientRect();
+            const gRect = gaugeBar.getBoundingClientRect();
+            const cursorCenter = cRect.left - gRect.left + cRect.width / 2;
+
+            let hit = false;
+            yellowZones.forEach((z) => {
+                const zRect = z.getBoundingClientRect();
+                const zStart = zRect.left - gRect.left;
+                const zEnd = zStart + zRect.width;
+                if (cursorCenter >= zStart && cursorCenter <= zEnd) hit = true;
+            });
+
+            if (hit) {
+                successCount++;
+
+                // 곡괭이 흔들림
+                pickaxe.classList.add('swing');
+                setTimeout(() => pickaxe.classList.remove('swing'), 300);
+
+                // 돌 흔들림
+                modalStone.classList.add('shake');
+                setTimeout(() => modalStone.classList.remove('shake'), 300);
+
+            } else {
+                failCount++;
+            }
+            updateStatus();
+
+            setTimeout(() => {
+                animationPaused = false;
+                if (successCount < 3 && failCount < 3) {
+                    cursor.classList.remove('paused');
+                    cursor.style.animationPlayState = 'running';
+                }
+            }, 400);
+        }
+
+        innerClose.addEventListener('click', () => { innerModal.style.display = 'none'; closeGameModal(); finalReward=''; });
+        failClose.addEventListener('click', () => { failModal.style.display = 'none'; closeGameModal(); finalReward=''; });
+
+        applyDifficulty();
+        resetGame();
+    </script>
+</body>
+</html>
