@@ -1,0 +1,60 @@
+{{> layouts/header}}
+
+<link rel="stylesheet" href="/css/smith.css">
+
+<div id="gameTitle">대장장이 미니게임</div>
+
+<div class="container">
+    <img id="stone" src="/assets/stone.png" alt="광석" />
+    <img id="anvil" src="/assets/anvil.png" alt="모루" />
+
+    <div id="difficulty-selector">
+        <span id="left-arrow">&lt;</span>
+        <span id="difficulty-text">초보</span>
+        <span id="right-arrow">&gt;</span>
+    </div>
+</div>
+
+<div id="gameModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" id="gameClose">&times;</span>
+        <h2>대장간 미니게임</h2>
+
+        <div class="modal-images">
+            <img class="modal-stone" id="modalStone" src="/assets/stone.png" alt="광석" />
+            <img class="modal-anvil" src="/assets/anvil.png" alt="모루" />
+            <img id="pickaxe" src="/assets/pickaxe.png" alt="곡괭이" />
+        </div>
+
+        <div class="gauge-bar-area" id="gaugeBar">
+            <div class="yellow-zone" id="yellowZone1"></div>
+            <div class="yellow-zone" id="yellowZone2"></div>
+            <div class="yellow-zone" id="yellowZone3"></div>
+            <div id="cursor"></div>
+        </div>
+
+        <p id="gameStatus">성공 횟수: <span id="successCount">0</span>회 | 실패 횟수: <span id="failCount">0</span>회</p>
+        <p>스페이스 바를 눌러 곡괭이를 멈추세요!</p>
+
+        <div class="inner-modal" id="innerModal">
+            <div class="inner-content">
+                <h3 id="rewardTitle">🎉 광석을 캤습니다! 🎉</h3>
+                <p id="rewardText">축하합니다. 광석을 획득했습니다.</p>
+                <button class="inner-close-button" id="innerClose">확인</button>
+            </div>
+        </div>
+
+        <div class="inner-modal" id="failModal">
+            <div class="inner-content">
+                <h3>💥 실패했습니다! 💥</h3>
+                <img id="failImage" src="/assets/broken_stone.png" alt="부서진 광석" style="width: 120px; margin: 10px 0;" />
+                <p>다시 도전하세요.</p>
+                <button class="inner-close-button" id="failClose">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/smith.js"></script>
+
+{{> layouts/footer}}

@@ -1,5 +1,6 @@
 package edu.mokpo.minigame.controller;
 
+import org.springframework.ui.Model;
 import edu.mokpo.minigame.dto.MemberDto;
 import edu.mokpo.minigame.entity.Member;
 import edu.mokpo.minigame.repository.MemberRepository;
@@ -25,12 +26,20 @@ public class MemberController {
 
     // 2. 회원가입 버튼 눌렀을 때 실행 (POST 방식)
     @PostMapping("/signup")
-    public String signupProcess(MemberDto memberDto) { // 1. DTO로 데이터를 받음
+    public String signupProcess(MemberDto memberDto, Model model) {
 
-        // 2. DTO를 Entity로 변환
+        // 1. 이미 존재하는 아이디인지 검사 (true면 이미 있음)
+        if (memberRepository.existsById(memberDto.getId())) {
+
+            // 2. 에러 메시지를 모델에 담음
+            model.addAttribute("error", "이미 사용 중인 아이디입니다. 다른 아이디를 입력해주세요.");
+
+            // 3. redirect가 아니라, 다시 signup 페이지를 보여줌 (에러 메시지와 함께)
+            return "signup";
+        }
+
+        // 4. 중복이 아니면 저장 진행
         Member member = memberDto.toEntity();
-
-        // 3. Repository에게는 Entity를 넘겨서 저장
         memberRepository.save(member);
 
         return "redirect:/";

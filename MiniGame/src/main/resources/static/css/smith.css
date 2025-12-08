@@ -1,0 +1,155 @@
+/* 대장장이 게임 스타일 */
+
+/* 배경 이미지 경로 수정됨 */
+body {
+    background-image: url('/assets/place.png');
+    background-size: cover;
+    background-position: center;
+    /* margin, display 설정은 헤더/푸터 레이아웃에 맡김 */
+}
+
+/* 게임 제목 */
+#gameTitle {
+    text-align: center;
+    font-size: 64px; /* 너무 커서 조금 줄임 */
+    font-weight: bold;
+    color: white;
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.6);
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 600px; /* 게임 영역 높이 확보 */
+}
+
+#anvil {
+    width: 600px;
+    height: 400px;
+    position: relative;
+    top: 150px;
+    z-index: 1;
+}
+
+#stone {
+    width: 240px;
+    height: 150px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(calc(-50% + 50px), calc(-50% - 20px));
+    z-index: 2;
+    cursor: pointer;
+}
+
+/* --- 모달 (게임 팝업) --- */
+.modal {
+    display: none;
+    position: fixed;
+    left: 0; top: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    justify-content: center; align-items: center;
+    z-index: 1000;
+}
+.modal-content {
+    position: relative;
+    width: 800px; max-width: 90%;
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    color: black; /* 글자색 검정 */
+}
+.close-button {
+    position: absolute; right: 20px; top: 10px;
+    font-size: 26px; cursor: pointer; color: #777;
+}
+
+.modal-images {
+    position: relative; height: 350px; margin-bottom: 20px;
+    display: flex; justify-content: center; align-items: flex-end;
+}
+.modal-anvil { width: 400px; height: 250px; position: absolute; bottom: 0; }
+.modal-stone {
+    width: 200px; height: 150px; position: absolute;
+    bottom: 200px; left: 55%; top: 30pt;
+    transform: translateX(-50%); z-index: 2;
+}
+
+#pickaxe {
+    position: absolute; bottom: 220px; left: calc(50% + 80px);
+    width: 120px; height: 120px; object-fit: contain;
+    transform-origin: top left; transition: transform 0.2s;
+}
+#pickaxe.swing { transform: rotate(-45deg) translateX(-20px); }
+
+/* 애니메이션 */
+@keyframes stone-shake {
+    0% { transform: translateX(-50%) translateY(0); }
+    25% { transform: translateX(calc(-50% - 10px)) translateY(0); }
+    50% { transform: translateX(calc(-50% + 10px)) translateY(0); }
+    75% { transform: translateX(calc(-50% - 10px)) translateY(0); }
+    100% { transform: translateX(-50%) translateY(0); }
+}
+.modal-stone.shake { animation: stone-shake 0.3s ease-in-out; }
+
+/* 게이지 바 */
+.gauge-bar-area {
+    width: 1000px; max-width: 100%; height: 50px;
+    background: red; margin: 30px auto; position: relative; overflow: hidden;
+}
+.yellow-zone {
+    position: absolute; top: 0; height: 100%; width: 50px;
+    background: yellow; opacity: 0.8;
+}
+#yellowZone1 { left: 20%; }
+#yellowZone2 { left: 50%; }
+#yellowZone3 { left: 80%; }
+
+#cursor {
+    position: absolute; top: -10px; width: 10px; height: 70px;
+    background: #fff; border-radius: 3px;
+    animation: moveCursor 1.5s linear infinite alternate;
+}
+#cursor.paused { animation-play-state: paused; }
+@keyframes moveCursor {
+    0% { left: 0; }
+    100% { left: calc(100% - 10px); }
+}
+
+#gameStatus { font-size: 20px; font-weight: 600; color: #333; margin-top: 10px; }
+
+/* 내부 모달 (성공/실패) */
+.inner-modal {
+    display: none; position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+    justify-content: center; align-items: flex-start;
+    background: rgba(0, 0, 0, 0.5); z-index: 20;
+}
+.inner-modal .inner-content {
+    width: 420px; background: #fff; padding: 20px;
+    border-radius: 8px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    text-align: center; margin-top: 150px; color: black;
+}
+.inner-close-button {
+    margin-top: 16px; padding: 8px 18px; border-radius: 6px;
+    border: none; cursor: pointer; background: gold; font-weight: 600;
+}
+
+/* 난이도 선택 */
+#difficulty-selector {
+    position: absolute; bottom: 50px; /* 위치 조정 */
+    display: flex; align-items: center; justify-content: center;
+    color: white; z-index: 10;
+    text-shadow: 2px 2px 4px #000;
+}
+#difficulty-selector span {
+    font-size: 48px; cursor: pointer; padding: 0 20px; user-select: none;
+}
+#difficulty-text {
+    font-size: 32px; font-weight: bold; min-width: 180px; text-align: center;
+}

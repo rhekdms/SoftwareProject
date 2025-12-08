@@ -12,5 +12,9 @@ public class GameController {
         return "game/potion"; // templates/game/potion.mustache를 찾아감
     }
 
-    // 2. (나중에) 두 번째 게임도 여기에 추가하면 됩니다.
+    // 2. 대장장이 게임 페이지로 이동
+    @GetMapping("/game/smith")
+    public String smithGame() {
+        return "game/smith";
+    }
 }
