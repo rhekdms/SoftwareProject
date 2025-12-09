@@ -42,7 +42,7 @@ public class MemberController {
         Member member = memberDto.toEntity();
         memberRepository.save(member);
 
-        return "redirect:/";
+        return "redirect:/login";
     }
 
     // 1. 로그인 페이지 보여주기
@@ -83,5 +83,51 @@ public class MemberController {
     public String logout(HttpSession session) {
         session.invalidate(); // 세션을 싹 비워서 로그인 정보를 날림
         return "redirect:/";
+    }
+
+    // 1. 회원 정보 페이지 보여주기
+    @GetMapping("/myinfo")
+    public String myInfoPage(HttpSession session, Model model) {
+        // 세션에서 현재 로그인한 사람 정보를 가져옴
+        Member loginMember = (Member) session.getAttribute("loginMember");
+
+        if (loginMember == null) {
+            return "redirect:/login"; // 로그인 안 했으면 튕겨내기
+        }
+
+        // DB에서 최신 정보를 다시 가져옴 (안전하게)
+        Member member = memberRepository.findById(loginMember.getId()).get();
+        model.addAttribute("member", member);
+
+        return "myinfo"; // myinfo.mustache 로 이동
+    }
+
+    // 2. 회원 정보 수정하기
+    @PostMapping("/myinfo/update")
+    public String updateMember(MemberDto memberDto, HttpSession session) {
+        // JPA의 save 함수는 똑같은 ID가 이미 있으면 '수정(Update)'을 수행합니다.
+        Member member = memberDto.toEntity();
+        memberRepository.save(member);
+
+        // ★ 중요: 세션에 저장된 정보도 갱신해줘야 함! (안 그러면 재로그인 전까지 옛날 비번으로 기억함)
+        session.setAttribute("loginMember", member);
+
+        return "redirect:/"; // 메인으로 이동
+    }
+
+    // 3. 회원 탈퇴하기
+    @GetMapping("/myinfo/delete")
+    public String deleteMember(HttpSession session) {
+        Member loginMember = (Member) session.getAttribute("loginMember");
+
+        if (loginMember != null) {
+            // DB에서 삭제
+            memberRepository.delete(loginMember);
+
+            // 세션 삭제 (로그아웃 처리)
+            session.invalidate();
+        }
+
+        return "redirect:/"; // 로그인 전 메인 화면으로 이동
     }
 }
