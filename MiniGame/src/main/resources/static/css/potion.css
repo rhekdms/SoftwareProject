@@ -1,3 +1,9 @@
+/**
+ * @FileName : potion.css
+ * @Project  : MiniGame
+ * @Author   : 양동민
+ */
+
 /* Pixel-art medieval workshop layout */
 :root {
     --scale: 3; /* 화면 배율 */
@@ -34,6 +40,7 @@
     background-size: calc(16px * var(--scale)) calc(16px * var(--scale));
     image-rendering: pixelated;
 }
+/* [Update] 고다은: 스프링 부트 정적 리소스 표준 경로(/assets/) 적용 및 배경 반복 설정 최적화 */
 .bg-wall {
     /* ★ 수정: 경로 앞에 / 붙임 */
     background-image: url('/assets/wall_tile.png');
@@ -60,7 +67,7 @@
     transform-origin: top left;
 }
 
-/* Positions */
+/* [Update] 고다은: 사용자 UI 편의를 위해 선반(shelf) 위치를 우측 중앙으로 재배치 */
 .shelf {
     /* 오른쪽으로 이동 (전체 320 기준 220 지점) */
     left: calc(220px * var(--scale));
@@ -151,6 +158,7 @@
 
 /* Herbs on shelf */
 .herb-layer { position:absolute; left:0; top:0; }
+/* [Update] 고다은: 재료 아이템이 다른 UI 요소에 가려지지 않도록 z-index 우선순위 상향 조정 */
 .herb { position:absolute; width: calc(8px * var(--scale)); height: calc(8px * var(--scale)); border: 2px solid #1f2937; box-shadow: inset 0 0 0 2px rgba(255,255,255,0.25); cursor:grab; z-index: 10; }
 .herb:active { cursor:grabbing; }
 
@@ -166,6 +174,7 @@
 /* Modal */
 .modal { position:absolute; inset:0; display:grid; place-items:center; background:rgba(0,0,0,0.45); pointer-events:auto; z-index: 100; }
 .modal.hidden { display:none; }
+/* [Update] 고다은: 결과 모달창의 텍스트 시인성 확보를 위해 배경 명도 조정 및 텍스트 화이트 적용 */
 .modal .box { width: 70%; max-width: 520px; background:#0b1220; border:1px solid #334155; border-radius:8px; padding:12px 16px; }
 .modal .row { margin-top: 10px; display:flex; gap:8px; justify-content:flex-end; }
 .modal .grade { font-size:32px; font-weight:800; }

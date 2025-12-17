@@ -1,3 +1,9 @@
+/**
+ * @FileName : LoginDto.java
+ * @Project  : MiniGame
+ * @Author   : 고다은
+ */
+
 package edu.mokpo.minigame.dto;
 
 public class LoginDto {

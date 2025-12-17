@@ -1,3 +1,9 @@
+/**
+ * @FileName : MemberController.java
+ * @Project  : MiniGame
+ * @Author   : 고다은
+ */
+
 package edu.mokpo.minigame.controller;
 
 import org.springframework.ui.Model;
@@ -78,7 +84,7 @@ public class MemberController {
         return "redirect:/login";
     }
 
-    // 3. 로그아웃 (보너스)
+    // 3. 로그아웃
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate(); // 세션을 싹 비워서 로그인 정보를 날림

@@ -1,4 +1,10 @@
-// 이미지 기본 경로 설정 (스프링 부트 static 폴더 기준)
+/**
+ * @FileName : smith.js
+ * @Project  : MiniGame
+ * @Author   : 임성민
+ */
+
+// [Update] 고다은: 기존 Flask 스타일의 경로를 스프링 부트 표준 정적 경로(/assets/)로 마이그레이션
 const IMG_BASE = "/assets/";
 
 const stone = document.getElementById('stone');
@@ -221,6 +227,7 @@ function checkHit() {
     }, 400);
 }
 
+// [Update] 고다은: 게임 재시작 시 이전 보상 데이터가 남아있는 버그 수정을 위해 finalReward 초기화 로직 추가
 innerClose.addEventListener('click', () => { innerModal.style.display = 'none'; closeGameModal(); finalReward=''; });
 failClose.addEventListener('click', () => { failModal.style.display = 'none'; closeGameModal(); finalReward=''; });
 

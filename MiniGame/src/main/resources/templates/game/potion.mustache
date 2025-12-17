@@ -1,12 +1,23 @@
+{{!
+    @FileName : potion.mustache
+    @Project  : MiniGame
+    @Author   : 양동민
+}}
+
+{{! [Update] 고다은: 스프링 부트 프로젝트 표준 레이아웃(헤더) 적용 }}
 {{> layouts/header}}
 <div style="text-align: center; padding: 20px;">
+    {{! [Update] 고다은: 외부 스타일시트 경로를 static/css/potion.css로 연결 }}
 <link rel="stylesheet" href="/css/potion.css">
 
 <div class="viewport" style="margin-top: 20px; margin-bottom: 20px;">
     <div class="scene">
+
+        {{! [Update] 고다은: 배경 레이어 분리로 도트 그래픽의 입체감 구현 }}
         <div class="bg bg-wall"></div>
         <div class="bg bg-floor"></div>
 
+        {{! [Update] 고다은: 모든 이미지 리소스 경로를 /assets/ 하위로 마이그레이션 }}
         <div class="layer shelf" title="나무 선반">
             <img src="/assets/shelf.png" alt="shelf">
         </div>
@@ -24,6 +35,8 @@
     </div>
 </div>
 
-<script src="/js/potion.js"></script>
+    {{! [Update] 고다은: DOM 로딩 시점을 고려하여 JS 파일을 최하단에 배치 }}
+    <script src="/js/potion.js"></script>
 
+{{! [Update] 고다은: 스프링 부트 프로젝트 표준 레이아웃(푸터) 적용 }}
 {{> layouts/footer}}

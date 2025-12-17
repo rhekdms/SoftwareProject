@@ -1,6 +1,12 @@
+/**
+ * @FileName : smith.css
+ * @Project  : MiniGame
+ * @Author   : 임성민
+ */
+
 /* 대장장이 게임 스타일 */
 
-/* 배경 이미지 경로 수정됨 */
+/* [Update] 고다은: 배경 이미지 호출 방식을 정적 리소스 표준 경로로 수정 */
 body {
     background-image: url('/assets/place.png');
     background-size: cover;

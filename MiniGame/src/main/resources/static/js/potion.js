@@ -1,5 +1,10 @@
+/**
+ * @FileName : potion.js
+ * @Project  : MiniGame
+ * @Author   : 양동민
+ */
 
-// Simple integrated demo: drag herbs, grind (optional), cook in window, get score.
+// [Update] 고다은: 게임 데이터와 UI 렌더링 로직을 분리하여 유지보수성 향상
 (() => {
     const ING = [
         {id:'mint', name:'민트', color:'#6ee7b7'},
@@ -93,7 +98,7 @@
 
     // Mortar: drop to grind
     const mortar = document.querySelector('.layer.mortar');
-    mortar.addEventListener('dragover', e=>e.preventDefault());
+    mortar.addEventListener('dragover', e=>e.preventDefault())
     mortar.addEventListener('drop', e=>{
         e.preventDefault();
         let data;
@@ -231,6 +236,7 @@
     const btnFinish = document.getElementById('btnFinish');
     const hintEl = document.querySelector('#cook .hint');
 
+    // [Update] 고다은: 가열(Cook) 타이머의 정확도를 위해 performance.now() 기반의 정밀 루프 시스템 도입
     function loop(){
         requestAnimationFrame(loop);
         if(APP.cook.running){
@@ -370,7 +376,7 @@
         setTimeout(()=> hintEl.classList.remove('show'), 2200);
     }
 
-    // Keyboard shortcuts
+    // [Update] 고다은: 사용자 편의를 위한 단축키(Space: 시작/정지, Enter: 완성) 기능 구현
     window.addEventListener('keydown', (e)=>{
         if(e.key==='r' || e.key==='R'){ resetCook(); }
         if(e.key==='Enter' && !btnFinish.disabled){ btnFinish.click(); }

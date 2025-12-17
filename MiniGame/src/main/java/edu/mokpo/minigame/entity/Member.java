@@ -1,3 +1,9 @@
+/**
+ * @FileName : Member.java
+ * @Project  : MiniGame
+ * @Author   : 고다은
+ */
+
 package edu.mokpo.minigame.entity;
 
 import jakarta.persistence.Column;

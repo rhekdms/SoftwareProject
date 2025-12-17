@@ -1,3 +1,9 @@
+/**
+ * @FileName : GameController.java
+ * @Project  : MiniGame
+ * @Author   : 고다은
+ */
+
 package edu.mokpo.minigame.controller;
 
 import org.springframework.stereotype.Controller;

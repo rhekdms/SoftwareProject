@@ -1,3 +1,9 @@
+/**
+ * @FileName : MemberRepository.java
+ * @Project  : MiniGame
+ * @Author   : 고다은
+ */
+
 package edu.mokpo.minigame.repository;
 
 import edu.mokpo.minigame.entity.Member;

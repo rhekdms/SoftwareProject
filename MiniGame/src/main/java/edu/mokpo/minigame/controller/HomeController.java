@@ -1,3 +1,9 @@
+/**
+ * @FileName : HomeController.java
+ * @Project  : MiniGame
+ * @Author   : 고다은
+ */
+
 package edu.mokpo.minigame.controller;
 
 import edu.mokpo.minigame.entity.Member; // Member import 확인!

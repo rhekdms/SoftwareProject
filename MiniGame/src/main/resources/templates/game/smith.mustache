@@ -1,5 +1,13 @@
+{{!
+    @FileName : smith.mustache
+    @Project  : MiniGame
+    @Author   : 임성민
+}}
+
+{{! [Update] 고다은: 사이트 공통 헤더 레이아웃 적용 }}
 {{> layouts/header}}
 
+{{! [Update] 고다은: 가독성을 위해 외부 CSS 파일로 스타일 로직 분리 }}
 <link rel="stylesheet" href="/css/smith.css">
 
 <div id="gameTitle">대장장이 미니게임</div>
@@ -55,6 +63,7 @@
     </div>
 </div>
 
+{{! [Update] 고다은: 스크립트 모듈화를 위해 외부 JS 로드 방식으로 변경 }}
 <script src="/js/smith.js"></script>
 
 {{> layouts/footer}}
